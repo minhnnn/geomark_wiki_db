@@ -1,0 +1,17 @@
+<?php
+
+namespace $NAMESPACE$\Entities;
+use Illuminate\Database\Eloquent\Model;
+//use Illuminate\Database\Eloquent\SoftDeletes;
+
+class $NAME$ extends Model
+{
+    //use SoftDeletes;
+    protected $fillable = [
+        $FILLABLE$
+    ];
+    public function getFillable()
+    {
+        return $this->fillable;
+    }
+}

@@ -1,0 +1,39 @@
+<template>
+    <div class="content-body">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <a :href="$backendRoute('$FOLDER$.$SLUG$.create')" class="btn btn-flat btn-success">create</a>
+                <form action="" style="display: inline-block;"  id="index-search-form">
+                    <input type="text" name="search" class="form-control index-search"><i class="fas fa-search"></i>
+                </form>
+            </div>
+            <div class="card-body pad table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <th>#</th>
+                        $THEADCONTENT$
+                    </thead>
+                    <template v-for="($KEY$, index) in all$NAME$.data">
+                        <tr :key="index">
+                            <td>{{(all$NAME$.total - 1) * all$NAME$.per_page + index + 1}}</td>
+                            $TBODYCONTENT$
+                        </tr>
+                    </template>
+                </table>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    name: "Index",
+    props: {
+        all$NAME$: Object,
+    }
+}
+</script>
+
+<style scoped>
+
+</style>

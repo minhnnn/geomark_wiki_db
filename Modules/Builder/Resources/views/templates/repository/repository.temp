@@ -1,0 +1,28 @@
+<?php
+
+namespace $NAMESPACE$\Repositories\$NAME$;
+
+use Modules\Admin\Repositories\Base\Query\QueryInterface;
+use Modules\Admin\Repositories\Base\Output\OutputInterface;
+
+interface $NAME$Repository
+{
+
+    public function get$NAME$(
+        QueryInterface $queryBuilder,
+        OutputInterface $output
+    );
+
+//    public function create$NAME$(array $all);
+//
+//    public function find$NAME$ById($$KEY$Id);
+//
+//    public function update$NAME$ById($$KEY$Id, $all);
+//
+//    public function delete$NAME$ById($$KEY$Id);
+//
+    public function getEmpty$NAME$();
+//
+    public function loadOldInput($$KEY$, \Illuminate\Http\Request $request);
+
+}

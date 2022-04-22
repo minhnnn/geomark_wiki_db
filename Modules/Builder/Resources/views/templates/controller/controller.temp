@@ -1,0 +1,79 @@
+<?php
+
+namespace $NAMESPACE$\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use $NAMESPACE$\Repositories\$NAME$\$NAME$Repository;
+use $NAMESPACE$\Http\Requests\$NAME$\CreateRequest;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Modules\Admin\Repositories\Base\Query\BaseQuery;
+use Modules\Admin\Repositories\Base\Output\PaginateCollectionOutput;
+
+
+class $NAME$Controller extends Controller
+{
+
+    private $NAME$Repository $$OBJ_NAME$Repo;
+
+    /**
+     * $NAME$Controller constructor.
+     */
+    public function __construct($NAME$Repository $$OBJ_NAME$Repo)
+    {
+        $this->$OBJ_NAME$Repo = $$OBJ_NAME$Repo;
+    }
+
+    public function index(){
+        $query = new BaseQuery();
+        $output = new PaginateCollectionOutput(15);
+        $all$NAME$ = $this->$OBJ_NAME$Repo->get$NAME$($query, $output);
+
+        return Inertia::render('$NAME$/Index', compact('all$NAME$'));
+    }
+
+    public function create(Request $request){
+        $$OBJ_NAME$ = $this->$OBJ_NAME$Repo->getEmpty$NAME$();
+        $$OBJ_NAME$ = $this->$OBJ_NAME$Repo->loadOldInput($$OBJ_NAME$, $request);
+
+        $breadcrumbs = [
+            ['link' => "/admin", 'name' => "Home"],
+            ['link' => "/admin/$SLUG$", 'name' => "$NAME$"],
+            [ 'name' => "Create"],
+        ];
+
+        return Inertia::render('$NAME$/Create', compact('$OBJ_NAME$','breadcrumbs'));
+    }
+
+    public function store(CreateRequest $request){
+        $new$NAME$ = $this->$OBJ_NAME$Repo->create$NAME$($request->all());
+        return redirect()->route('$FOLDER$.$SLUG$.index');
+    }
+
+    public function edit($$OBJ_NAME$Id, Request $request){
+        $$OBJ_NAME$ = $this->$OBJ_NAME$Repo->find$NAME$ById($$OBJ_NAME$Id);
+        $$OBJ_NAME$ = $this->$OBJ_NAME$Repo->loadOldInput($$OBJ_NAME$, $request);
+
+        $breadcrumbs = [
+            ['link' => "/admin", 'name' => "Home"],
+            ['link' => "/admin/$SLUG$", 'name' => "$NAME$"],
+            [ 'name' => "Edit"],
+        ];
+
+        return Inertia::render('$NAME$/Edit', compact('$OBJ_NAME$','breadcrumbs'));
+    }
+
+
+    public function update($$OBJ_NAME$Id,Request $request){
+
+        $$OBJ_NAME$ = $this->$OBJ_NAME$Repo->update$NAME$ById($$OBJ_NAME$Id,$request->all());
+        return redirect()->route('$FOLDER$.$SLUG$.index');
+
+    }
+
+    public function destroy($$OBJ_NAME$Id){
+        $result = $this->$OBJ_NAME$Repo->delete$NAME$ById($$OBJ_NAME$Id);
+        return redirect()->route('$FOLDER$.$SLUG$.index');
+    }
+
+}

@@ -1,0 +1,79 @@
+<?php
+
+namespace $NAMESPACE$\Repositories\$NAME$;
+
+use $NAMESPACE$\Entities\$NAME$;
+use Modules\Admin\Repositories\Base\BaseRepository;
+use Modules\Admin\Repositories\Base\Query\QueryInterface;
+use Modules\Admin\Repositories\Base\Output\OutputInterface;
+use Illuminate\Database\Eloquent\Builder;
+
+class $NAME$RepositoryEloquent extends BaseRepository implements $NAME$Repository
+{
+
+    public function query(): Builder
+    {
+        return $NAME$::query();
+    }
+
+    public function get$NAME$(
+        QueryInterface $queryBuilder,
+        OutputInterface $output
+    )    {
+        return $this->get(
+            $queryBuilder,
+            $output
+        );
+    }
+
+//    public function create$NAME$(array $all)
+//    {
+//    return $this->query()->create($all);
+//    }
+//
+//    public function find$NAME$ById($$KEY$Id)
+//    {
+//        return $this->query()->find($$KEY$Id);
+//    }
+//
+//    public function update$NAME$ById($$KEY$Id, $all)
+//    {
+//
+//        $$KEY$ = return $this->query()->find($$KEY$Id);
+//
+//        if ($$KEY$) {
+//            return $$KEY$->update($all);
+//        } else {
+//            return false;
+//        }
+//    }
+//
+//    public function delete$NAME$ById($$KEY$Id)
+//    {
+//        $$KEY$ = return $this->query()->find($$KEY$Id);
+//
+//        if ($$KEY$) {
+//            return $$KEY$->delete();
+//        } else {
+//            return false;
+//        }
+//    }
+//
+    public function getEmpty$NAME$()
+    {
+        return new  $NAME$();
+    }
+
+    public function loadOldInput($$KEY$, \Illuminate\Http\Request $request)
+            {
+                $fillable = $$KEY$->getFillable();
+                foreach($fillable as $field){
+                    if($request->old($field)) {
+                        $$KEY$->$field = $request->old($field);
+                    }
+                }
+                return $$KEY$;
+            }
+
+
+}

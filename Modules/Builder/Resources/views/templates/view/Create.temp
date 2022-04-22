@@ -1,0 +1,24 @@
+<template>
+    <div class="content-body">
+        <div class="card card-primary card-outline">
+            <div class="card-body pad table-responsive">
+                <default-form
+                    :submit-name="'$SUBMITNAME$'"
+                    :submit-route-name="'$SUBMIT_ROUTE_NAME$'"
+                ></default-form>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import DefaultForm from "./Form/DefaultForm";
+export default {
+    name: "Create",
+    components: {DefaultForm}
+}
+</script>
+
+<style scoped>
+
+</style>
