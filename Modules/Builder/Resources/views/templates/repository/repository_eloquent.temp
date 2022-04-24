@@ -4,8 +4,10 @@ namespace $NAMESPACE$\Repositories\$NAME$;
 
 use $NAMESPACE$\Entities\$NAME$;
 use Modules\Admin\Repositories\Base\BaseRepository;
+use Modules\Admin\Repositories\Base\Input\InputDataInterface;
 use Modules\Admin\Repositories\Base\Query\QueryInterface;
 use Modules\Admin\Repositories\Base\Output\OutputInterface;
+use Modules\Admin\Repositories\Base\Output\ObjectOutputInterface;
 use Illuminate\Database\Eloquent\Builder;
 
 class $NAME$RepositoryEloquent extends BaseRepository implements $NAME$Repository
@@ -26,39 +28,30 @@ class $NAME$RepositoryEloquent extends BaseRepository implements $NAME$Repositor
         );
     }
 
-//    public function create$NAME$(array $all)
-//    {
-//    return $this->query()->create($all);
-//    }
-//
-//    public function find$NAME$ById($$KEY$Id)
-//    {
-//        return $this->query()->find($$KEY$Id);
-//    }
-//
-//    public function update$NAME$ById($$KEY$Id, $all)
-//    {
-//
-//        $$KEY$ = return $this->query()->find($$KEY$Id);
-//
-//        if ($$KEY$) {
-//            return $$KEY$->update($all);
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    public function delete$NAME$ById($$KEY$Id)
-//    {
-//        $$KEY$ = return $this->query()->find($$KEY$Id);
-//
-//        if ($$KEY$) {
-//            return $$KEY$->delete();
-//        } else {
-//            return false;
-//        }
-//    }
-//
+    public function find$NAME$(QueryInterface $queryBuilder, ObjectOutputInterface $output)
+        {
+            return $this->find(
+                $queryBuilder,
+                $output
+            );
+        }
+
+    public function create$NAME$(InputDataInterface $inputData)
+    {
+        return $this->query()->create($inputData->getData());
+    }
+
+    public function update$NAME$(InputDataInterface $inputData, QueryInterface $queryBuilder)
+    {
+        return $queryBuilder->buildQuery($this->query())
+            ->update($inputData->getData());
+    }
+
+    public function delete$NAME$(QueryInterface $queryBuilder)
+    {
+        return $queryBuilder->buildQuery($this->query())->delete();
+    }
+
     public function getEmpty$NAME$()
     {
         return new  $NAME$();

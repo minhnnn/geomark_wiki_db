@@ -1,0 +1,39 @@
+<template>
+    <div class="content-body">
+        <div class="card card-primary card-outline">
+            <div class="card-body pad table-responsive">
+                <form @submit.prevent="submitForm">
+                    $INPUTCONTENT$
+                    <button class="btn btn-success mt-3" :loading="form.processing" type="submit">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+
+import TextInput from "../../Shared/TextInput";
+import TextareaInput from "../../Shared/TextareaInput";
+
+export default {
+    name: "Create",
+    components: {TextInput, TextareaInput},
+    data() {
+        return {
+            form: this.$inertia.form({
+                $FORMDATA$
+            })
+        }
+    },
+    methods: {
+        submitForm() {
+            this.form.post(this.$backendRoute('$FOLDER$.$SLUG$.store'));
+        }
+    }
+}
+</script>
+
+<style scoped>
+
+</style>

@@ -1,4 +1,4 @@
-@extends('default')
+@extends('builder::layouts.master')
 @section('content')
     <div class="container-fluid">
         <div class="card">

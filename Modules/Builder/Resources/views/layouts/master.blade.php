@@ -7,13 +7,13 @@
         <title>Module Builder</title>
 
        {{-- Laravel Mix - CSS File --}}
-       {{-- <link rel="stylesheet" href="{{ mix('css/builder.css') }}"> --}}
-
+        <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+        @yield('after-styles')
     </head>
     <body>
         @yield('content')
-
         {{-- Laravel Mix - JS File --}}
         {{-- <script src="{{ mix('js/builder.js') }}"></script> --}}
+        @yield('after-scripts')
     </body>
 </html>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <label v-if="label" class="form-label" :for="id">{{ label }}:</label>
-        <input :id="id" ref="input" v-bind="$attrs" class="form-control" :class="{ error: error }" :type="type" :value="value" @input="$emit('input', $event.target.value)" />
+        <textarea :id="id" ref="input" v-bind="$attrs" class="form-control" :class="{ error: error }" :value="value" @input="$emit('input', $event.target.value)" />
         <div v-if="error" class="text-sm text-red">{{ error }}</div>
     </div>
 </template>
@@ -15,12 +15,8 @@ export default {
         id: {
             type: String,
             default() {
-                return `text-input-${uuid()}`
+                return `textarea-input-${uuid()}`
             },
-        },
-        type: {
-            type: String,
-            default: 'text',
         },
         error: String,
         label: String,
@@ -33,9 +29,6 @@ export default {
         },
         select() {
             this.$refs.input.select()
-        },
-        setSelectionRange(start, end) {
-            this.$refs.input.setSelectionRange(start, end)
         },
     },
 }

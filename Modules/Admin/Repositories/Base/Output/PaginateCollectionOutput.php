@@ -3,7 +3,6 @@
 namespace Modules\Admin\Repositories\Base\Output;
 
 use Illuminate\Database\Eloquent\Builder;
-use PhpParser\Node\Expr\FuncCall;
 
 class PaginateCollectionOutput implements OutputInterface
 {

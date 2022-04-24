@@ -1,5 +1,5 @@
-@extends('default')
-@push('after-styles')
+@extends('builder::layouts.master')
+@section('after-styles')
     <style>
         .type_collection {
             display: none;
@@ -8,7 +8,7 @@
             display: none;
         }
     </style>
-@endpush
+@endsection
 @section('content')
     <div class="col-md-12">
         <h1>Build Form Fields</h1>
@@ -32,8 +32,9 @@
                         @endforeach
                     </select>
                     <div class="col-md-6">
-                        <a href="{{route('admin.node.curdBuilder',$nodeChartData['id'])}}" class="btn btn-success">Build CURD</a>
+                        <a href="{{route('admin.node.baseFileBuilder',$nodeChartData['id'])}}" class="btn btn-default">Build Base File</a>
                         <a href="{{route('admin.node.getFetchTable',$nodeChartData['id'])}}" class="btn btn-primary">Fetch Table</a>
+                        <a href="{{route('admin.node.curdBuilder',$nodeChartData['id'])}}" class="btn btn-success">Build CURD</a>
                     </div>
                 </div>
             </div>
@@ -106,11 +107,12 @@
     </div>
 @stop
 
-@push('after-scripts')
+@section('after-scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script>
-
         $(document).ready(function() {
             $('#select_root', 0).change(function() {
+                console.log('hit')
                 window.location.replace('/admin/node/' + $(this).val() + '/?root_id=' + $(this).val());
             });
 
@@ -122,7 +124,6 @@
                 }
             });
         });
-
     </script>
 
-@endpush
+@endsection

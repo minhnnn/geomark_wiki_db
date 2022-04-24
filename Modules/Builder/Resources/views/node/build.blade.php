@@ -1,5 +1,5 @@
-@extends('default')
-@push('after-styles')
+@extends('builder::layouts.master')
+@section('after-styles')
     <style>
         ul.build-actions {
             padding-left: 0px;
@@ -10,7 +10,7 @@
             margin-bottom: 10px;
         }
     </style>
-@endpush
+@endsection
 @section('content')
     <div class="container">
         <form action="{{route('admin.node.curdCreate',$currentNode->id)}}" method="POST">
@@ -44,12 +44,11 @@
             <div class="col-md-12">
                 <ul class="build-actions">
                     <li>
-                        <button type="submit" value="baseRepository" name="action" class="btn btn-primary">Build Base Repository
+                        <button type="submit" value="model" name="action" class="btn btn-primary">Build Model and Repository
                         </button>
-                        <div style="font-size: 10px; color: red">( build in Admin module only use if have Admin module and don't have base file repository )</div>
                     </li>
                     <li>
-                        <button type="submit" value="model" name="action" class="btn btn-primary">Build Model
+                        <button type="submit" value="view" name="action" class="btn btn-primary">Build view
                         </button>
                     </li>
                     <li>
@@ -57,15 +56,7 @@
                         </button>
                     </li>
                     <li>
-                        <button type="submit" value="form" name="action" class="btn btn-primary">Build Form
-                        </button>
-                    </li>
-                    <li>
                         <button type="submit" value="request" name="action" class="btn btn-primary">Build Request
-                        </button>
-                    </li>
-                    <li>
-                        <button type="submit" value="view" name="action" class="btn btn-primary">Build view
                         </button>
                     </li>
                 </ul>

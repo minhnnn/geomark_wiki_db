@@ -3,36 +3,27 @@
         <div class="card card-primary card-outline">
             <div class="card-body pad table-responsive">
                 <form @submit.prevent="submitForm">
-                    <!--email Input -->
-                    <div class="form-group">
-                        <text-input
+                    
+                         <text-input
                             v-model="form.email"
                             :error="form.errors.email"
-                            class="form-control col-md-6"
                             label="email"
                         ></text-input>
-                    </div>
-
-                    <!--name Input -->
-                    <div class="form-group">
-                        <text-input
+                    
+                         <textarea-input
                             v-model="form.name"
                             :error="form.errors.name"
-                            class="form-control col-md-6"
                             label="name"
-                        ></text-input>
-                    </div>
-
-                    <!--password Input -->
-                    <div class="form-group">
-                        <text-input
+                        ></textarea-input>
+                    
+                         <text-input
                             v-model="form.password"
                             :error="form.errors.password"
-                            class="form-control col-md-6"
                             label="password"
+                            :type="'number'"
                         ></text-input>
-                    </div>
-                    <loading-button :loading="form.processing" type="submit">Edit user</loading-button>
+                    
+                    <button class="btn btn-success mt-3" :loading="form.processing" type="submit">Edit</button>
                 </form>
             </div>
         </div>
@@ -42,10 +33,11 @@
 <script>
 
 import TextInput from "../../Shared/TextInput";
-import LoadingButton from "../../Shared/LoadingButton";
+import TextareaInput from "../../Shared/TextareaInput";
+
 export default {
-    name: "Edit.vue",
-    components: {LoadingButton, TextInput},
+    name: "Edit",
+    components: {TextInput, TextareaInput},
     props: {
         user: Object
     },
@@ -53,8 +45,9 @@ export default {
         return {
             form: this.$inertia.form({
                 email: this.user.email,
-                name: this.user.name,
-                password: this.user.password,
+name: this.user.name,
+password: this.user.password,
+
             })
         }
     },

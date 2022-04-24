@@ -8,7 +8,7 @@ class User extends Model
 {
     //use SoftDeletes;
     protected $fillable = [
-        'email','name','password',
+        'User','email','email_verified_at','name','password','remember_token',
     ];
     public function getFillable()
     {

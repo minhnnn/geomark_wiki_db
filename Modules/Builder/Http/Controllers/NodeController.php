@@ -24,34 +24,12 @@ class NodeController extends Controller
      */
     public function __construct(Node $nodeRepo)
     {
-
         $this->nodeRepo = $nodeRepo;
     }
 
-    public function index(Request $request)
+    public function index()
     {
         return redirect()->route('admin.node.show', ['node' => 0, 'root_id' => 0]);
-    }
-
-
-    public function create(Request $request)
-    {
-        return redirect()->route('admin.node.show', ['node' => 0, 'root_id' => 0]);
-    }
-
-    public function store(Request $request)
-    {
-        if ($request->get('form_action') == 'create') {
-            $currentNode = $this->nodeRepo->createNode($request->all());
-        } else {
-            $currentNode = $this->nodeRepo->findNode($request->get('node_id'));
-            $currentNode = $this->nodeRepo->updateNode($currentNode->id, $request->all());
-        }
-
-        if ((int) $currentNode->parent_id === 0) {
-            return redirect()->route('admin.node.index');
-        }
-        return redirect()->to(route('admin.node.index').'?root_id='.$currentNode->parent_id);
     }
 
     public function show($nodeId, Request $request)
@@ -95,14 +73,47 @@ class NodeController extends Controller
         );
     }
 
+    public function create(Request $request)
+    {
+        return redirect()->route('admin.node.show', ['node' => 0, 'root_id' => 0]);
+    }
+
+    public function store(Request $request)
+    {
+        if ($request->get('form_action') == 'create') {
+            $currentNode = $this->nodeRepo->createNode($request->all());
+        } else {
+            $currentNode = $this->nodeRepo->findNode($request->get('node_id'));
+            $currentNode = $this->nodeRepo->updateNode($currentNode->id, $request->all());
+        }
+
+        if ((int) $currentNode->parent_id === 0) {
+            return redirect()->route('admin.node.index');
+        }
+        return redirect()->to(route('admin.node.index').'?root_id='.$currentNode->parent_id);
+    }
+
+    public function baseFileBuilder($nodeId, $action = '')
+    {
+        $modules = Module::all();
+        $currentNode = Node::find($nodeId);
+        $allFields = Node::where('parent_id', $currentNode->id)->get();
+        return view(
+            'builder::node.build_base',
+            compact('currentNode', 'allFields', 'modules')
+        );
+    }
+
 
     public function curdBuilder($nodeId, $action = '')
     {
         $modules = Module::all();
-
         $currentNode = Node::find($nodeId);
         $allFields = Node::where('parent_id', $currentNode->id)->get();
-        return view('builder::node.build', compact('currentNode', 'allFields', 'modules'));
+        return view(
+            'builder::node.build',
+            compact('currentNode', 'allFields', 'modules')
+        );
     }
 
     public function getFetchTable($nodeId)
@@ -150,7 +161,6 @@ class NodeController extends Controller
                     'key' => $key,
                     'type' => $column['type'],
                 ];
-                dump($newNodeData);
                 $this->nodeRepo->createNode($newNodeData);
             }
         }
@@ -171,75 +181,127 @@ class NodeController extends Controller
         return redirect()->back()->withInput();
     }
 
+    public function baseIntertiaCreate(Node $node, $fields, $module)
+    {
+        $moduleName = $module->getName();
+        $templatePath = module_path('Builder', 'Resources/views/templates/base/innertia');
+        $filePath = 'Modules/'.$moduleName.'/Resources/assets/js/Shared';
+        $filesCreate = [];
+
+        $paginationTemp = $templatePath.'/pagination.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Pagination.vue',
+            'fileContent' => $this->replaceTemplate([], [], $paginationTemp)
+        ];
+
+        $textInputTemp = $templatePath.'/text_input.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/TextInput.vue',
+            'fileContent' => $this->replaceTemplate([], [], $textInputTemp)
+        ];
+
+        $textareaInputTemp = $templatePath.'/textarea_input.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/TextareaInput.vue',
+            'fileContent' => $this->replaceTemplate([], [], $textareaInputTemp)
+        ];
+
+        foreach($filesCreate as $fileCreate)
+        {
+            $this->createFile(
+                $fileCreate['filePath'],
+                $fileCreate['fileContent']
+            );
+        }
+
+        return true;
+    }
+
     public function baseRepositoryCreate(Node $node, $fields, $module)
     {
         $moduleName = $module->getName();
-        $namespace = 'Modules\\'.$moduleName;
-        $moduleFolder = $module->getLowerName();
-        $modulePath = $module->getPath();
-        $templatePath = module_path('Builder', 'Resources/views/templates/repository/base');
+        $filePath = 'Modules/Admin/Repositories/Base';
+        $templatePath = module_path('Builder', 'Resources/views/templates/base/repository');
+        $filesCreate = [];
 
         //create RepositoryInterface.php
         $repositoryInterfaceTemp = $templatePath.'/repository_interface.temp';
-        $repositoryInterfaceContent = $this->replaceTemplate([], [], $repositoryInterfaceTemp);
-
-        Storage::disk('base')
-            ->put(
-                'Modules/Admin/Repositories/Base/RepositoryInterface.php',
-                $repositoryInterfaceContent
-            );
+        $filesCreate[] = [
+            'filePath' => $filePath.'/RepositoryInterface.php',
+            'fileContent' => $this->replaceTemplate([], [], $repositoryInterfaceTemp)
+        ];
 
         //create BaseRepository.php
         $baseRepositoryInterfaceTemp = $templatePath.'/base_repository.temp';
-        $baseRepositoryInterfaceContent = $this->replaceTemplate([], [], $baseRepositoryInterfaceTemp);
-        Storage::disk('base')
-            ->put(
-                'Modules/Admin/Repositories/Base/BaseRepository.php',
-                $baseRepositoryInterfaceContent
-            );
+        $filesCreate[] = [
+            'filePath' => $filePath.'/BaseRepository.php',
+            'fileContent' => $this->replaceTemplate([], [], $baseRepositoryInterfaceTemp)
+        ];
 
-        //create InputDataInterface.php
+        //create Base/Input
         $inputDataInterfaceTemp = $templatePath.'/input/input_data_interface.temp';
-        $inputDataInterfaceContent = $this->replaceTemplate([], [], $inputDataInterfaceTemp);
-        Storage::disk('base')
-            ->put(
-                'Modules/Admin/Repositories/Base/Input/InputDataInterface.php',
-                $inputDataInterfaceContent
-            );
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Input/InputDataInterface.php',
+            'fileContent' => $this->replaceTemplate([], [], $inputDataInterfaceTemp)
+        ];
 
-        //create Base/Output
-        $outputInterfaceTemp = $templatePath.'/out_put/output_interface.temp';
-        $outputInterfaceContent = $this->replaceTemplate([], [], $outputInterfaceTemp);
-        Storage::disk('base')
-            ->put(
-                'Modules/Admin/Repositories/Base/Output/OutputInterface.php',
-                $outputInterfaceContent
-            );
-
-        $paginateCollectionOutputTemp = $templatePath.'/out_put/paginate_collection_output.temp';
-        $paginateCollectionOutputContent = $this->replaceTemplate([], [], $paginateCollectionOutputTemp);
-        Storage::disk('base')
-            ->put(
-                'Modules/Admin/Repositories/Base/Output/PaginateCollectionOutput.php',
-                $paginateCollectionOutputContent
-            );
+        $inputDataFromRequestTemp = $templatePath.'/input/input_data_from_request.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Input/InputDataFromRequest.php',
+            'fileContent' => $this->replaceTemplate([], [], $inputDataFromRequestTemp)
+        ];
 
         //create Base/Query
         $queryInterfaceTemp = $templatePath.'/query/query_interface.temp';
-        $queryInterfaceContent = $this->replaceTemplate([], [], $queryInterfaceTemp);
-        Storage::disk('base')
-            ->put(
-                'Modules/Admin/Repositories/Base/Query/QueryInterface.php',
-                $queryInterfaceContent
-            );
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Query/QueryInterface.php',
+            'fileContent' => $this->replaceTemplate([], [], $queryInterfaceTemp)
+        ];
 
         $baseQueryTemp = $templatePath.'/query/base_query.temp';
-        $baseQueryContent = $this->replaceTemplate([], [], $baseQueryTemp);
-        Storage::disk('base')
-            ->put(
-                'Modules/Admin/Repositories/Base/Query/BaseQuery.php',
-                $baseQueryContent
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Query/BaseQuery.php',
+            'fileContent' => $this->replaceTemplate([], [], $baseQueryTemp)
+        ];
+
+        $getByIdTemp = $templatePath.'/query/get_by_id.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Query/GetById.php',
+            'fileContent' => $this->replaceTemplate([], [], $getByIdTemp)
+        ];
+
+        //create Base/Output
+        $outputInterfaceTemp = $templatePath.'/output/output_interface.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Output/OutputInterface.php',
+            'fileContent' => $this->replaceTemplate([], [], $outputInterfaceTemp)
+        ];
+
+        $objectOutputInterfaceTemp = $templatePath.'/output/object_output_interface.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Output/ObjectOutputInterface.php',
+            'fileContent' => $this->replaceTemplate([], [], $objectOutputInterfaceTemp)
+        ];
+
+        $paginateCollectionOutputTemp = $templatePath.'/output/paginate_collection_output.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Output/PaginateCollectionOutput.php',
+            'fileContent' => $this->replaceTemplate([], [], $paginateCollectionOutputTemp)
+        ];
+
+        $objectOutputTemp = $templatePath.'/output/object_output.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Output/ObjectOutput.php',
+            'fileContent' => $this->replaceTemplate([], [], $objectOutputTemp)
+        ];
+
+        foreach($filesCreate as $fileCreate)
+        {
+            $this->createFile(
+                $fileCreate['filePath'],
+                $fileCreate['fileContent']
             );
+        }
 
         return true;
     }
@@ -280,9 +342,11 @@ class NodeController extends Controller
 
         $modulePath = $module->getPath();
         $templatePath = module_path('Builder', 'Resources/views/templates/view');
+        $filePath = 'Modules/'.$moduleName.'/Resources/assets/js/Pages/'.ucwords(\Str::of($node->key)->slug());
+        $filesCreate = [];
 
-        //create index.blade.php
-        $indexTemplate = $templatePath.'/Index.temp';
+        //create Index.vue
+        $indexTemplate = $templatePath.'/index.temp';
 
         $allFields = Node::whereParentId($node->id)->where('type', '!=', 'object')->get();
         $tHeadContent = '';
@@ -296,12 +360,10 @@ class NodeController extends Controller
         $tHeadContent .= '<th></th>';
         $tBodyContent .=
             '<td>
-                <a
-                    class="btn btn-primary btn-ms"
-                    :href="$backendRoute(\''.$moduleFolder.'.'.\Str::of($node->key)->slug().'.edit\','.$node->key.'.id)"
-                >
-                Edit</a>
-            </td>';
+                <Link :href="$backendRoute(\''.$moduleFolder.'.'.\Str::of($node->key)->slug().'.edit\','.$node->key.'.id)" class="btn btn-primary">Edit</Link>
+                <button type="button" @click="delete'.$node->name.'('.$node->key.')" class="btn btn-danger">Delete</button>
+            </td>
+            ';
 
         $indexContent = '';
         $indexContent .= $this->replaceTemplate(
@@ -313,40 +375,89 @@ class NodeController extends Controller
             $indexTemplate
         );
 
-        $result = Storage::disk('base')->put(
-            'Modules/'.$moduleName.'/Resources/assets/js/Pages/'.ucwords(\Str::of($node->key)->slug()).'/Index.vue',
-            $indexContent
-        );
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Index.vue',
+            'fileContent' => $indexContent
+        ];
+
+        //create form
+        $allPros = Node::where('parent_id', $node->id)->where('type', '!=', 'object')->get();
+
+        $inputContent = '';
+        $createFormData = '';
+        $updateFormData = '';
+
+        foreach ($allPros as $pro) {
+
+            $createFormData .= $pro->key . ':null,' . "\n";
+            $updateFormData .= $pro->key . ': this.' . \Str::of($node->key)->slug(). '.' . $pro->key . ',' . "\n";
+
+            $vueInputData = 'v-model="form.'.$pro->key.'"
+                            :error="form.errors.'.$pro->key.'"
+                            label="'.$pro->key.'"';
+
+            switch ($pro->type) {
+                case 'text':
+                    $inputContent .= '
+                         <text-input
+                            '.$vueInputData.'
+                        ></text-input>
+                    ';
+                    break;
+                case 'number':
+                    $inputContent .= '
+                         <text-input
+                            '.$vueInputData.'
+                            :type="\'number\'"
+                        ></text-input>
+                    ';
+                    break;
+                case 'textarea':
+                    $inputContent .= '
+                         <textarea-input
+                            '.$vueInputData.'
+                        ></textarea-input>
+                    ';
+                    break;
+            }
+        }
 
         //create create.blade.php
-        $createViewTemplate = $templatePath.'/Create.temp';
-
-        $submitName = 'create';
-        $submitRouteName = $moduleFolder.'.'.\Str::of($node->key)->slug().'.store';
+        $createViewTemplate = $templatePath.'/create.temp';
 
         $createViewContent = $this->replaceTemplate(
-            ['$SUBMITNAME$', '$SUBMIT_ROUTE_NAME$'],
-            [$submitName, $submitRouteName],
+            ['$INPUTCONTENT$', '$SLUG$', '$FOLDER$', '$FORMDATA$'],
+            [$inputContent, \Str::of($node->key)->slug(), $moduleFolder, $createFormData],
             $createViewTemplate
         );
 
-        $result = Storage::disk('base')->put(
-            'Modules/'.$moduleName.'/Resources/assets/js/Pages/'.ucwords(\Str::of($node->key)->slug()).'/Create.vue',
-            $createViewContent
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Create.vue',
+            'fileContent' => $createViewContent
+        ];
+
+        //edit edit.blade.php
+        $editViewTemplate = $templatePath.'/edit.temp';
+
+        $editViewContent = $this->replaceTemplate(
+            ['$INPUTCONTENT$', '$SLUG$', '$FOLDER$', '$FORMDATA$'],
+            [$inputContent, \Str::of($node->key)->slug(), $moduleFolder, $updateFormData],
+            $editViewTemplate
         );
-//
-//        //edit edit.blade.php
-//        $editViewTemplate = $templatePath.'/edit.blade.php';
-//        $editViewContent = $this->replaceTemplate(
-//            ['$TYPE$', '$NAME$', '$KEY$', '$SLUG$', '$FOLDER$', '$OBJECT_NAME$'],
-//            [$node->type, $node->name, $node->key, \Str::of($node->key)->slug(), $moduleFolder, $node->objName],
-//            $editViewTemplate
-//        );
-//
-//        Storage::disk('base')->put(
-//            'Modules/'.$moduleName.'/Resources/views/'.\Str::of($node->key)->slug().'/edit.blade.php',
-//            $editViewContent
-//        );
+
+        $filesCreate[] = [
+            'filePath' => $filePath.'/Edit.vue',
+            'fileContent' => $editViewContent
+        ];
+
+        foreach($filesCreate as $fileCreate)
+        {
+            $this->createFile(
+                $fileCreate['filePath'],
+                $fileCreate['fileContent']
+            );
+        }
+
         return true;
     }
 
@@ -524,5 +635,12 @@ class NodeController extends Controller
         }
 
         return $tableArr;
+    }
+
+    private function createFile($filePath, $fileContent)
+    {
+        if(!Storage::disk('base')->exists($filePath)) {
+            Storage::disk('base')->put($filePath, $fileContent);
+        }
     }
 }

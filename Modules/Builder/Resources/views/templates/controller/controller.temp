@@ -3,13 +3,17 @@
 namespace $NAMESPACE$\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use $NAMESPACE$\Repositories\$NAME$\$NAME$Repository;
-use $NAMESPACE$\Http\Requests\$NAME$\CreateRequest;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Admin\Repositories\Base\Query\BaseQuery;
+use Modules\Admin\Repositories\Base\Query\GetById;
 use Modules\Admin\Repositories\Base\Output\PaginateCollectionOutput;
-
+use Modules\Admin\Repositories\Base\Output\ObjectOutput;
+use Modules\Admin\Repositories\Base\Input\InputDataFromRequest;
+use $NAMESPACE$\Repositories\$NAME$\$NAME$Repository;
+use $NAMESPACE$\Http\Requests\$NAME$\CreateRequest;
+use $NAMESPACE$\Http\Requests\$NAME$\UpdateRequest;
 
 class $NAME$Controller extends Controller
 {
@@ -36,13 +40,7 @@ class $NAME$Controller extends Controller
         $$OBJ_NAME$ = $this->$OBJ_NAME$Repo->getEmpty$NAME$();
         $$OBJ_NAME$ = $this->$OBJ_NAME$Repo->loadOldInput($$OBJ_NAME$, $request);
 
-        $breadcrumbs = [
-            ['link' => "/admin", 'name' => "Home"],
-            ['link' => "/admin/$SLUG$", 'name' => "$NAME$"],
-            [ 'name' => "Create"],
-        ];
-
-        return Inertia::render('$NAME$/Create', compact('$OBJ_NAME$','breadcrumbs'));
+        return Inertia::render('$NAME$/Create', compact('$OBJ_NAME$'));
     }
 
     public function store(CreateRequest $request){

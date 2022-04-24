@@ -2,8 +2,10 @@
 
 namespace $NAMESPACE$\Repositories\$NAME$;
 
+use Modules\Admin\Repositories\Base\Input\InputDataInterface;
 use Modules\Admin\Repositories\Base\Query\QueryInterface;
 use Modules\Admin\Repositories\Base\Output\OutputInterface;
+use Modules\Admin\Repositories\Base\Output\ObjectOutputInterface;
 
 interface $NAME$Repository
 {
@@ -13,16 +15,22 @@ interface $NAME$Repository
         OutputInterface $output
     );
 
-//    public function create$NAME$(array $all);
-//
-//    public function find$NAME$ById($$KEY$Id);
-//
-//    public function update$NAME$ById($$KEY$Id, $all);
-//
-//    public function delete$NAME$ById($$KEY$Id);
-//
+    public function find$NAME$(
+        QueryInterface $queryBuilder,
+        ObjectOutputInterface $output
+    );
+
+    public function create$NAME$(InputDataInterface $inputData);
+
+    public function update$NAME$(
+        InputDataInterface $inputData,
+        QueryInterface $queryBuilder
+    );
+
+    public function delete$NAME$(QueryInterface $queryBuilder);
+
     public function getEmpty$NAME$();
-//
+
     public function loadOldInput($$KEY$, \Illuminate\Http\Request $request);
 
 }
