@@ -596,28 +596,44 @@ class NodeController extends Controller
 
         $moduleName = $module->getName();
         $namespace = 'Modules\\'.$moduleName;
-        $modulePath = $module->getPath();
-
-
-        $templatePath = module_path('Builder', 'Resources/views/templates');
-        $createRequestTemplate = $templatePath.'/createRequest.temp';
+        $templatePath = module_path('Builder', 'Resources/views/templates/request');
+        $filePath = 'Modules/'.$moduleName.'/Http/Requests/'.ucfirst($node->name);
+        $filesCreate = [];
 
         $rulestring = '';
         foreach ($fields as $field) {
-//            'name'=>'required',
             $rulestring .= "'".$field."'=>'required',\n            ";
         }
 
-        $createRequestContent = $this->replaceTemplate(
-            ['$NAME$', '$RULES$', '$NAMESPACE$'],
-            [$node->name, $rulestring, $namespace],
-            $createRequestTemplate
-        );
+        $createRequestTemplate = $templatePath.'/create_request.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/CreateRequest.php',
+            'fileContent' => $this->replaceTemplate(
+                ['$NAME$', '$RULES$', '$NAMESPACE$'],
+                [$node->name, $rulestring, $namespace],
+                $createRequestTemplate
+            )
+        ];
 
-        return Storage::disk('base')->put(
-            'Modules/'.$moduleName.'/Http/Requests/'.ucfirst($node->name).'/CreateRequest.php',
-            $createRequestContent
-        );
+        $editRequestTemplate = $templatePath.'/update_request.temp';
+        $filesCreate[] = [
+            'filePath' => $filePath.'/UpdateRequest.php',
+            'fileContent' => $this->replaceTemplate(
+                ['$NAME$', '$RULES$', '$NAMESPACE$'],
+                [$node->name, $rulestring, $namespace],
+                $editRequestTemplate
+            )
+        ];
+
+        foreach($filesCreate as $fileCreate)
+        {
+            $this->createFile(
+                $fileCreate['filePath'],
+                $fileCreate['fileContent']
+            );
+        }
+
+        return true;
     }
 
     public function replaceTemplate($find, $replace, $template)
