@@ -206,6 +206,12 @@ class NodeController extends Controller
             'fileContent' => $this->replaceTemplate([], [], $textareaInputTemp)
         ];
 
+        $vueTemp = module_path('Builder', 'Resources/views/templates/vue_intertia').'/intertia.temp';
+        $filesCreate[] = [
+            'filePath' => 'Modules/'.$moduleName.'/Resources/assets/js/intertia.js',
+            'fileContent' => $this->replaceTemplate([], [], $vueTemp)
+        ];
+
         foreach($filesCreate as $fileCreate)
         {
             $this->createFile(

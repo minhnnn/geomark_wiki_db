@@ -1,2 +1,2 @@
-require('./vue');
+require('./intertia');
 require('./base');

@@ -11,6 +11,4 @@
 |
 */
 
-Route::group(['prefix'=>'admin','as'=>'admin.'], function() {
-    Route::resource('user', 'UserController');
-});
+Route::group(['prefix'=>'admin','as'=>'admin.'], function() {});
